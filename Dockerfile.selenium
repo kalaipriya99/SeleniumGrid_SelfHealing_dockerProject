@@ -1,0 +1,31 @@
+# Use a valid Maven + Java 17 image
+FROM eclipse-temurin:17-jdk
+
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy project files
+COPY pom.xml .
+COPY src ./src
+COPY testng.xml .
+
+# Build project (skip tests for faster build)
+RUN mvn clean install -DskipTests
+
+# Set Healenium properties (optional, if you need them as env)
+ENV HEALENIUM_PROPERTIES=\
+"heal-enabled=true\n\
+recovery-tries=1\n\
+score-cap=0.5\n\
+hlm.server.url=http://hlm-backend:7878\n\
+hlm.imitator.url=http://selector-imitator:8000"
+
+# Run tests
+COPY entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
