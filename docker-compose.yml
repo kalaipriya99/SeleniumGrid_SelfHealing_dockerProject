@@ -18,6 +18,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
   hlm-backend:
     image: healenium/hlm-backend:3.4.10
@@ -33,6 +35,8 @@ services:
       postgres-db:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
   selector-imitator:
     image: healenium/hlm-selector-imitator:1.4
@@ -42,6 +46,8 @@ services:
     depends_on:
       - hlm-backend
     restart: unless-stopped
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
   selenium-hub:
     image: selenium/hub:4.22.0
@@ -53,6 +59,8 @@ services:
       GRID_BROWSER_TIMEOUT: 300
       GRID_TIMEOUT: 300
     restart: unless-stopped
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
   chrome-node:
     image: selenium/node-chrome:4.22.0
@@ -60,13 +68,15 @@ services:
     depends_on:
       - selenium-hub
     environment:
-      SE_EVENT_BUS_HOST: selenium_hub
+      SE_EVENT_BUS_HOST: selenium-hub
       SE_EVENT_BUS_PUBLISH_PORT: 4442
       SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
       SE_NODE_MAX_SESSIONS: 2
       SE_NODE_OVERRIDE_MAX_SESSIONS: true
     shm_size: 2g
     restart: unless-stopped
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
   edge-node:
     image: selenium/node-edge:4.22.0
@@ -74,13 +84,15 @@ services:
     depends_on:
       - selenium-hub
     environment:
-      SE_EVENT_BUS_HOST: selenium_hub
+      SE_EVENT_BUS_HOST: selenium-hub
       SE_EVENT_BUS_PUBLISH_PORT: 4442
       SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
       SE_NODE_MAX_SESSIONS: 2
       SE_NODE_OVERRIDE_MAX_SESSIONS: true
     shm_size: 2g
     restart: unless-stopped
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
   selenium-tests:
     build:
@@ -107,6 +119,12 @@ services:
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     tty: true
     restart: "no"
+    networks:
+      - seleniumgrid_network_${BUILD_NUMBER}
 
 volumes:
   db_data:
+
+networks:
+  seleniumgrid_network_${BUILD_NUMBER}:
+    driver: bridge
