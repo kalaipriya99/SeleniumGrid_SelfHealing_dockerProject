@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres-db:
     image: postgres:15-alpine
-    container_name: healenium_postgres_${BUILD_NUMBER}
+    container_name: healenium_postgres
     environment:
       POSTGRES_DB: healenium
       POSTGRES_USER: healenium_user
@@ -19,11 +19,11 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
   hlm-backend:
     image: healenium/hlm-backend:3.4.10
-    container_name: hlm_backend_${BUILD_NUMBER}
+    container_name: hlm_backend
     ports:
       - "7878:7878"
     environment:
@@ -36,22 +36,22 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
   selector-imitator:
     image: healenium/hlm-selector-imitator:1.4
-    container_name: selector_imitator_${BUILD_NUMBER}
+    container_name: selector_imitator
     ports:
       - "8000:8000"
     depends_on:
       - hlm-backend
     restart: unless-stopped
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
   selenium-hub:
     image: selenium/hub:4.22.0
-    container_name: selenium_hub_${BUILD_NUMBER}
+    container_name: selenium_hub
     ports:
       - "4444:4444"
     environment:
@@ -60,11 +60,11 @@ services:
       GRID_TIMEOUT: 300
     restart: unless-stopped
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
   chrome-node:
     image: selenium/node-chrome:4.22.0
-    container_name: chrome_node_${BUILD_NUMBER}
+    container_name: chrome_node
     depends_on:
       - selenium-hub
     environment:
@@ -76,11 +76,11 @@ services:
     shm_size: 2g
     restart: unless-stopped
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
   edge-node:
     image: selenium/node-edge:4.22.0
-    container_name: edge_node_${BUILD_NUMBER}
+    container_name: edge_node
     depends_on:
       - selenium-hub
     environment:
@@ -92,13 +92,13 @@ services:
     shm_size: 2g
     restart: unless-stopped
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
   selenium-tests:
     build:
       context: .
       dockerfile: Dockerfile.selenium
-    container_name: selenium_tests_${BUILD_NUMBER}
+    container_name: selenium_tests
     depends_on:
       - hlm-backend
       - selector-imitator
@@ -120,11 +120,11 @@ services:
     tty: true
     restart: "no"
     networks:
-      - seleniumgrid_network_${BUILD_NUMBER}
+      - seleniumgrid_network
 
 volumes:
   db_data:
 
 networks:
-  seleniumgrid_network_${BUILD_NUMBER}:
+  seleniumgrid_network:
     driver: bridge
