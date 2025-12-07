@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres-db:
     image: postgres:15-alpine
-    container_name: healenium_postgres
+    container_name: healenium_postgres_${BUILD_NUMBER}
     environment:
       POSTGRES_DB: healenium
       POSTGRES_USER: healenium_user
@@ -21,7 +21,7 @@ services:
 
   hlm-backend:
     image: healenium/hlm-backend:3.4.10
-    container_name: hlm_backend
+    container_name: hlm_backend_${BUILD_NUMBER}
     ports:
       - "7878:7878"
     environment:
@@ -36,7 +36,7 @@ services:
 
   selector-imitator:
     image: healenium/hlm-selector-imitator:1.4
-    container_name: selector_imitator
+    container_name: selector_imitator_${BUILD_NUMBER}
     ports:
       - "8000:8000"
     depends_on:
@@ -45,7 +45,7 @@ services:
 
   selenium-hub:
     image: selenium/hub:4.22.0
-    container_name: selenium_hub
+    container_name: selenium_hub_${BUILD_NUMBER}
     ports:
       - "4444:4444"
     environment:
@@ -56,7 +56,7 @@ services:
 
   chrome-node:
     image: selenium/node-chrome:4.22.0
-    container_name: chrome_node
+    container_name: chrome_node_${BUILD_NUMBER}
     depends_on:
       - selenium-hub
     environment:
@@ -70,7 +70,7 @@ services:
 
   edge-node:
     image: selenium/node-edge:4.22.0
-    container_name: edge_node
+    container_name: edge_node_${BUILD_NUMBER}
     depends_on:
       - selenium-hub
     environment:
@@ -86,7 +86,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.selenium
-    container_name: selenium_tests
+    container_name: selenium_tests_${BUILD_NUMBER}
     depends_on:
       - hlm-backend
       - selector-imitator
