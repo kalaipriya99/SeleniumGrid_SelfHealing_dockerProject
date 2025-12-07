@@ -3,8 +3,10 @@ package utils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -16,7 +18,7 @@ public class ScreenshotUtils {
         File source = ts.getScreenshotAs(OutputType.FILE);
 
         // Add timestamp to avoid overwriting screenshots
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
         String path = System.getProperty("user.dir") + "/screenshots/" + screenshotName + "_" + timestamp + ".png";
 
         File destination = new File(path);
